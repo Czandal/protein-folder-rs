@@ -1,7 +1,6 @@
 use std::cell::Cell;
 
-use crate::{proteins_map::ProteinMap, protein::Protein};
-
+use super::{protein::Protein, protein_map::ProteinMap};
 
 fn should_insert(
     score: i32,
@@ -159,16 +158,16 @@ fn expand(
 }
 
 // returns (score, number of branches)
-pub fn compute_score(monomers_string: String) -> (i32, usize) {
+pub fn compute_score(monomers_string: &str, p1: f64, p2: f64) -> (i32, usize) {
     // 0. Handle edge case, which is monomers_string.len() < 2
     if monomers_string.len() < 2 {
         return (0, 1);
     }
     // 1. Convert the input into vector of monomers (bool) -> true if hydrophobic, false otherwise
     let mut monomers_iter = monomers_string
-        .into_bytes()
+        .as_bytes()
         .into_iter()
-        .map(|byte| byte == 'H' as u8 || byte == 'h' as u8);
+        .map(|byte| *byte == 'H' as u8 || *byte == 'h' as u8);
     // 2. Compute conformations by iterating through monomers and adding one by one to possible
     //    conformations
     let mut possible_conformations: Vec<ProteinMap> = vec![ProteinMap {
@@ -199,4 +198,3 @@ pub fn compute_score(monomers_string: String) -> (i32, usize) {
     }
     (best_score, possible_conformations.len())
 }
-

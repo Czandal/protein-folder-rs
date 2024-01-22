@@ -1,6 +1,7 @@
 use std::cell::Cell;
 
-use crate::protein::Protein;
+use super::protein::Protein;
+
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ProteinMap {
     pub score: Cell<i32>,
