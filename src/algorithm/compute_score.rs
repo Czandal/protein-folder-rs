@@ -1,31 +1,18 @@
 use std::cell::Cell;
 
+use rand::Rng;
+
 use super::{protein::Protein, protein_map::ProteinMap};
 
-fn should_insert(
-    score: i32,
-    highest_score: i32,
-    sum_of_scores: i32,
-    analyzed_conformations: i32,
-) -> bool {
-    if score >= highest_score {
-        return true;
-    }
-    // equivalent of score > sum_of_score_so_far/analyzed_conformations which is equivalent to
-    // score > average score
-    if score * analyzed_conformations >= sum_of_scores {
-        // TODO: Probability p1 to reject
-        return true;
-    }
-
-    // reject with probability p2
-    return false;
-}
-fn expand(
+fn expand<InsertAuthority>(
     current_conformations: Vec<ProteinMap>,
     next_monomer: bool,
     highest_score: i32,
-) -> (Vec<ProteinMap>, i32) {
+    mut should_insert: InsertAuthority,
+) -> (Vec<ProteinMap>, i32)
+where
+    InsertAuthority: FnMut(i32, i32, i32, i32) -> bool,
+{
     let mut conformations = Vec::with_capacity(current_conformations.len());
     // if next monomer is polar, so it does not impact energy of the structure
     if !next_monomer {
@@ -34,7 +21,7 @@ fn expand(
             let tail = conformation
                 .points
                 .last()
-                .unwrap_or_else(|| panic!("Provided non conformation map as starting point"));
+                .unwrap_or_else(|| panic!("Provided empty map as starting point"));
             // append to the left
             let mut left_conformation = conformation.clone();
             if left_conformation
@@ -163,12 +150,13 @@ pub fn compute_score(monomers_string: &str, p1: f64, p2: f64) -> (i32, usize) {
     if monomers_string.len() < 2 {
         return (0, 1);
     }
-    // 1. Convert the input into vector of monomers (bool) -> true if hydrophobic, false otherwise
+    // 1. Create random generator
+    let mut rng = rand::thread_rng();
     let mut monomers_iter = monomers_string
         .as_bytes()
         .into_iter()
         .map(|byte| *byte == 'H' as u8 || *byte == 'h' as u8);
-    // 2. Compute conformations by iterating through monomers and adding one by one to possible
+    // 3. Compute conformations by iterating through monomers and adding one by one to possible
     //    conformations
     let mut possible_conformations: Vec<ProteinMap> = vec![ProteinMap {
         score: Cell::from(0),
@@ -194,7 +182,26 @@ pub fn compute_score(monomers_string: &str, p1: f64, p2: f64) -> (i32, usize) {
     let mut best_score: i32 = 0;
 
     for monomer in monomers_iter {
-        (possible_conformations, best_score) = expand(possible_conformations, monomer, best_score);
+        (possible_conformations, best_score) = expand(
+            possible_conformations,
+            monomer,
+            best_score,
+            |score: i32, highest_score: i32, sum_of_scores: i32, analyzed_conformations: i32| {
+                if score >= highest_score {
+                    return true;
+                }
+                let random_var: f64 = rng.gen();
+                // equivalent of score > sum_of_score_so_far/analyzed_conformations which is equivalent to
+                // score > average score
+                if score * analyzed_conformations >= sum_of_scores {
+                    // reject with probability p1
+                    return random_var > p1;
+                }
+
+                // reject with probability p2
+                return random_var > p2;
+            },
+        );
     }
     (best_score, possible_conformations.len())
 }

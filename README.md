@@ -11,7 +11,7 @@ Algorithm *is* case sensitive and naive. It assumes that the input string is cor
 ## Benchmarks
 Here there will be different benchmarks of different versions of the algorithm
 
-### Bruteforce (p1 and p2 equal to 1.0 or not-implemented):
+### Bruteforce (bounding not implemented):
 |  Input  |  Number of branches | Score | Time elapsed (ns) | Timeout exceeded | Ran |
 |---------|---------------------|-------|-------------------|------------------|-----|
 | HHHH | 4 | 1 | 5240 | false | true |
@@ -21,6 +21,21 @@ Here there will be different benchmarks of different versions of the algorithm
 | PPPHHPPHHPPPPPHHHHHHHPPHHPPPPHHPPHPP | N/A | N/A | N/A | N/A | false |
 | PPHPPHHPPHHPPPPPHHHHHHHHHHPPPPPPHHPPHHPPHPPHHHHH | N/A | N/A | N/A | N/A | false |
 | PPHPPHPHPHHHHPHPPPHPPPHPPPPHPPPHPPPHPHHHHPHPHPHPHH | N/A | N/A | N/A | N/A | false |
+| PPHHHPHHHHHHHHPPPHHHHHHHHHHPHPPPHHHHHHHHHHHHPPPPHHHHHHPHHPHP | N/A | N/A | N/A | N/A | false |
+| HHHHHHHHHHHHPHPHPPHHPPHHPPHPPHHPPHHPPHPPHHPPHHPPHPHPHHHHHHHHHHHH | N/A | N/A | N/A | N/A | false |
+| HHHHPPPPHHHHHHHHHHHHPPPPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHPPHHPPHHPPHPH | N/A | N/A | N/A | N/A | false |
+| PPPHHPPHHHHPPHHHPHHPHHPHHHHPPPPPPPPHHHHHHPPHHHHHHPPPPPPPPPHPHHPHHHHHHHHHHHPPHHHPHHPHPPHPHHHPPPPPPHHH | N/A | N/A | N/A | N/A | false |
+
+### Bounding implemented (p1 set to 0.8 and p2 to 0.99)
+|  Input  |  Number of branches | Score | Time elapsed (ns) | Timeout exceeded | Ran |
+|---------|---------------------|-------|-------------------|------------------|-----|
+| HHHH | 4 | 1 | 17391 | false | true |
+| HPHPPHHPHPPHPHHPPHPH | 18 | 9 | 364645 | false | true |
+| HHPPHPPHPPHPPHPPHPPHPPHH | 941 | 8 | 13387463 | false | true |
+| PPHPPHHPPPPHHPPPPHHPPPPHH | 3215 | 7 | 40413682 | false | true |
+| PPPHHPPHHPPPPPHHHHHHHPPHHPPPPHHPPHPP | 277 | 13 | 6935525 | false | true |
+| PPHPPHHPPHHPPPPPHHHHHHHHHHPPPPPPHHPPHHPPHPPHHHHH | 24 | 17 | 8269019 | false | true |
+| PPHPPHPHPHHHHPHPPPHPPPHPPPPHPPPHPPPHPHHHHPHPHPHPHH | 4343 | 17 | 40205298250 | true | true |
 | PPHHHPHHHHHHHHPPPHHHHHHHHHHPHPPPHHHHHHHHHHHHPPPPHHHHHHPHHPHP | N/A | N/A | N/A | N/A | false |
 | HHHHHHHHHHHHPHPHPPHHPPHHPPHPPHHPPHHPPHPPHHPPHHPPHPHPHHHHHHHHHHHH | N/A | N/A | N/A | N/A | false |
 | HHHHPPPPHHHHHHHHHHHHPPPPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHHHHHHHHHHHHPPPHPPHHPPHHPPHPH | N/A | N/A | N/A | N/A | false |
