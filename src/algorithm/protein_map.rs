@@ -14,7 +14,17 @@ pub struct ProteinMap {
 
 impl ProteinMap {
     pub fn find(&self, x: i32, y: i32) -> Option<&Protein> {
-        self.points.iter().find(|prot| x == prot.x && y == prot.y)
+        let mut iter: usize = 0;
+        while iter < self.points.len() {
+            if self.points[iter].x == x && self.points[iter].y == y {
+                return Some(&self.points[iter]);
+            }
+            let minimum_distance =
+                (x - self.points[iter].x).abs() + (y - self.points[iter].y).abs();
+            iter += minimum_distance as usize;
+        }
+        self.points.iter().find(|prot| x == prot.x && y == prot.y);
+        None
     }
     fn update_score(&self, new_tail: &Protein) {
         let old_tail = self.points.last();
@@ -69,7 +79,9 @@ impl ProteinMap {
             return Some(());
         }
         let tail = self.points[self.points.len() - 1];
-        if !tail.neighbours(&protein) { panic!("Tried to push protein which does not neighbour tail") }
+        if !tail.neighbours(&protein) {
+            panic!("Tried to push protein which does not neighbour tail")
+        }
         let protein_at_appended_pos = self.find(protein.x, protein.y);
         match protein_at_appended_pos {
             Some(_) => None,
@@ -98,10 +110,30 @@ mod test {
             min_x: 0,
             min_y: 0,
             max_y: 1,
-            points: vec![Protein{x:0,y:0, hydrophobic: true}, Protein{x:0,y:1, hydrophobic: true}, Protein{x:1,y:1, hydrophobic: true}],
+            points: vec![
+                Protein {
+                    x: 0,
+                    y: 0,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 0,
+                    y: 1,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 1,
+                    y: 1,
+                    hydrophobic: true,
+                },
+            ],
         };
 
-        map.push(Protein {x: 1, y:0, hydrophobic: true});
+        map.push(Protein {
+            x: 1,
+            y: 0,
+            hydrophobic: true,
+        });
 
         assert_eq!(map.score.get(), 1);
 
@@ -109,19 +141,40 @@ mod test {
         assert_eq!(map.max_y, 1);
         assert_eq!(map.min_x, 0);
         assert_eq!(map.max_x, 1);
-        assert_eq!(map.push(Protein {x: 1, y:-1, hydrophobic: true}), Some(()));
+        assert_eq!(
+            map.push(Protein {
+                x: 1,
+                y: -1,
+                hydrophobic: true
+            }),
+            Some(())
+        );
         assert_eq!(map.max_y, 1);
         assert_eq!(map.min_x, 0);
         assert_eq!(map.max_x, 1);
         assert_eq!(map.min_y, -1);
         assert_eq!(map.score.get(), 1);
-        assert_eq!(map.push(Protein {x: 0, y:-1, hydrophobic: true}), Some(()));
+        assert_eq!(
+            map.push(Protein {
+                x: 0,
+                y: -1,
+                hydrophobic: true
+            }),
+            Some(())
+        );
         assert_eq!(map.score.get(), 2);
         assert_eq!(map.max_y, 1);
         assert_eq!(map.min_x, 0);
         assert_eq!(map.max_x, 1);
         assert_eq!(map.min_y, -1);
-        assert_eq!(map.push(Protein {x: -1, y:-1, hydrophobic: true}), Some(()));
+        assert_eq!(
+            map.push(Protein {
+                x: -1,
+                y: -1,
+                hydrophobic: true
+            }),
+            Some(())
+        );
         assert_eq!(map.score.get(), 2);
         assert_eq!(map.max_y, 1);
         assert_eq!(map.min_x, -1);
@@ -137,12 +190,34 @@ mod test {
             min_x: 0,
             min_y: 0,
             max_y: 1,
-            points: vec![Protein{x:0,y:0, hydrophobic: true}, Protein{x:0,y:1, hydrophobic: true}, Protein{x:1,y:1, hydrophobic: true}],
+            points: vec![
+                Protein {
+                    x: 0,
+                    y: 0,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 0,
+                    y: 1,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 1,
+                    y: 1,
+                    hydrophobic: true,
+                },
+            ],
         };
 
-        assert_eq!(map.push(Protein {x: 0, y:1, hydrophobic: true}), None);
+        assert_eq!(
+            map.push(Protein {
+                x: 0,
+                y: 1,
+                hydrophobic: true
+            }),
+            None
+        );
     }
-
 
     #[test]
     #[should_panic]
@@ -153,9 +228,29 @@ mod test {
             min_x: 0,
             min_y: 0,
             max_y: 1,
-            points: vec![Protein{x:0,y:0, hydrophobic: true}, Protein{x:0,y:1, hydrophobic: true}, Protein{x:1,y:1, hydrophobic: true}],
+            points: vec![
+                Protein {
+                    x: 0,
+                    y: 0,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 0,
+                    y: 1,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 1,
+                    y: 1,
+                    hydrophobic: true,
+                },
+            ],
         };
-        map.push(Protein {x: 10, y:1, hydrophobic: true});
+        map.push(Protein {
+            x: 10,
+            y: 1,
+            hydrophobic: true,
+        });
     }
 
     #[test]
@@ -166,19 +261,39 @@ mod test {
             min_x: 0,
             min_y: 0,
             max_y: 1,
-            points: vec![Protein{x:0,y:0, hydrophobic: true}, Protein{x:0,y:1, hydrophobic: true}, Protein{x:1,y:1, hydrophobic: true}],
+            points: vec![
+                Protein {
+                    x: 0,
+                    y: 0,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 0,
+                    y: 1,
+                    hydrophobic: true,
+                },
+                Protein {
+                    x: 1,
+                    y: 1,
+                    hydrophobic: true,
+                },
+            ],
         };
 
         let result = map.find(1, 0);
         assert_eq!(result, None);
 
-        let existing_result = map.find(0,1);
+        let existing_result = map.find(0, 1);
         assert_eq!(existing_result, Some(&map.points[1]));
-        map.push(Protein {x: 1, y:0, hydrophobic: true});
+        map.push(Protein {
+            x: 1,
+            y: 0,
+            hydrophobic: true,
+        });
         let result_after_push = map.find(1, 0);
         assert_eq!(result_after_push, Some(&map.points[3]));
     }
-    
+
     #[test]
     fn push_allows_to_build_valid_map() {
         let mut map = ProteinMap {
@@ -187,11 +302,36 @@ mod test {
             min_x: 0,
             min_y: 0,
             max_y: 0,
-            points: vec![Protein{x:0,y:0, hydrophobic: true}],
+            points: vec![Protein {
+                x: 0,
+                y: 0,
+                hydrophobic: true,
+            }],
         };
-        assert_eq!(map.push(Protein {x: 0, y:1, hydrophobic: true}), Some(()));
-        assert_eq!(map.push(Protein {x: 1, y:1, hydrophobic: true}), Some(()));
-        assert_eq!(map.push(Protein {x: 1, y:0, hydrophobic: true}), Some(()));
+        assert_eq!(
+            map.push(Protein {
+                x: 0,
+                y: 1,
+                hydrophobic: true
+            }),
+            Some(())
+        );
+        assert_eq!(
+            map.push(Protein {
+                x: 1,
+                y: 1,
+                hydrophobic: true
+            }),
+            Some(())
+        );
+        assert_eq!(
+            map.push(Protein {
+                x: 1,
+                y: 0,
+                hydrophobic: true
+            }),
+            Some(())
+        );
         assert_eq!(map.score.get(), 1);
         assert_eq!(map.min_y, 0);
         assert_eq!(map.max_y, 1);
