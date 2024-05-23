@@ -156,14 +156,10 @@ pub fn compute_score(monomers_string: &str, p1: f64, p2: f64) -> (i32, usize) {
         .as_bytes()
         .into_iter()
         .map(|byte| *byte == 'H' as u8 || *byte == 'h' as u8);
-    // 3. Compute conformations by iterating through monomers and adding one by one to possible
+    // 2. Compute conformations by iterating through monomers and adding one by one to possible
     //    conformations
     let mut possible_conformations: Vec<ProteinMap> = vec![ProteinMap {
         score: Cell::from(0),
-        max_x: 0,
-        min_x: 0,
-        min_y: 0,
-        max_y: 0,
         points: vec![
             // NOTE: Any possible conformation of two monomers looks the same (is linear), so to
             // save power we hardcode them here
@@ -191,9 +187,10 @@ pub fn compute_score(monomers_string: &str, p1: f64, p2: f64) -> (i32, usize) {
                     return true;
                 }
                 let random_var: f64 = rng.gen();
-                // equivalent of score > sum_of_score_so_far/analyzed_conformations which is equivalent to
-                // score > average score
-                if score * analyzed_conformations >= sum_of_scores {
+                // equivalent of score < sum_of_score_so_far/analyzed_conformations which is equivalent to
+                // score < average score
+                // equivalent to energy > average energy
+                if score * analyzed_conformations <= sum_of_scores {
                     // reject with probability p1
                     return random_var > p1;
                 }

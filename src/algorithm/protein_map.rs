@@ -5,10 +5,6 @@ use super::protein::Protein;
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ProteinMap {
     pub score: Cell<i32>,
-    pub max_x: i32,
-    pub min_x: i32,
-    pub min_y: i32,
-    pub max_y: i32,
     pub points: Vec<Protein>,
 }
 
@@ -71,10 +67,6 @@ impl ProteinMap {
 
     pub fn push(&mut self, protein: Protein) -> Option<()> {
         if self.points.is_empty() {
-            self.max_x = protein.x;
-            self.min_x = protein.x;
-            self.max_y = protein.y;
-            self.min_y = protein.y;
             self.points.push(protein);
             return Some(());
         }
@@ -88,10 +80,6 @@ impl ProteinMap {
             None => {
                 self.update_score(&protein);
                 self.points.push(protein);
-                self.max_x = self.max_x.max(protein.x);
-                self.max_y = self.max_y.max(protein.y);
-                self.min_y = self.min_y.min(protein.y);
-                self.min_x = self.min_x.min(protein.x);
                 Some(())
             }
         }
@@ -106,10 +94,6 @@ mod test {
     fn push_updates_score_and_coords() {
         let mut map = ProteinMap {
             score: Cell::from(0),
-            max_x: 1,
-            min_x: 0,
-            min_y: 0,
-            max_y: 1,
             points: vec![
                 Protein {
                     x: 0,
@@ -137,10 +121,6 @@ mod test {
 
         assert_eq!(map.score.get(), 1);
 
-        assert_eq!(map.min_y, 0);
-        assert_eq!(map.max_y, 1);
-        assert_eq!(map.min_x, 0);
-        assert_eq!(map.max_x, 1);
         assert_eq!(
             map.push(Protein {
                 x: 1,
@@ -149,10 +129,6 @@ mod test {
             }),
             Some(())
         );
-        assert_eq!(map.max_y, 1);
-        assert_eq!(map.min_x, 0);
-        assert_eq!(map.max_x, 1);
-        assert_eq!(map.min_y, -1);
         assert_eq!(map.score.get(), 1);
         assert_eq!(
             map.push(Protein {
@@ -163,10 +139,6 @@ mod test {
             Some(())
         );
         assert_eq!(map.score.get(), 2);
-        assert_eq!(map.max_y, 1);
-        assert_eq!(map.min_x, 0);
-        assert_eq!(map.max_x, 1);
-        assert_eq!(map.min_y, -1);
         assert_eq!(
             map.push(Protein {
                 x: -1,
@@ -176,20 +148,12 @@ mod test {
             Some(())
         );
         assert_eq!(map.score.get(), 2);
-        assert_eq!(map.max_y, 1);
-        assert_eq!(map.min_x, -1);
-        assert_eq!(map.max_x, 1);
-        assert_eq!(map.min_y, -1);
     }
 
     #[test]
     fn push_does_not_allow_push_on_existing_pos() {
         let mut map = ProteinMap {
             score: Cell::from(0),
-            max_x: 1,
-            min_x: 0,
-            min_y: 0,
-            max_y: 1,
             points: vec![
                 Protein {
                     x: 0,
@@ -224,10 +188,6 @@ mod test {
     fn push_panics_on_pushing_position_which_is_too_far_from_tail() {
         let mut map = ProteinMap {
             score: Cell::from(0),
-            max_x: 1,
-            min_x: 0,
-            min_y: 0,
-            max_y: 1,
             points: vec![
                 Protein {
                     x: 0,
@@ -257,10 +217,6 @@ mod test {
     fn find_should_return_none_on_nonexistent_place() {
         let mut map = ProteinMap {
             score: Cell::from(0),
-            max_x: 1,
-            min_x: 0,
-            min_y: 0,
-            max_y: 1,
             points: vec![
                 Protein {
                     x: 0,
@@ -298,10 +254,6 @@ mod test {
     fn push_allows_to_build_valid_map() {
         let mut map = ProteinMap {
             score: Cell::from(0),
-            max_x: 0,
-            min_x: 0,
-            min_y: 0,
-            max_y: 0,
             points: vec![Protein {
                 x: 0,
                 y: 0,
@@ -333,9 +285,5 @@ mod test {
             Some(())
         );
         assert_eq!(map.score.get(), 1);
-        assert_eq!(map.min_y, 0);
-        assert_eq!(map.max_y, 1);
-        assert_eq!(map.min_x, 0);
-        assert_eq!(map.max_x, 1);
     }
 }
